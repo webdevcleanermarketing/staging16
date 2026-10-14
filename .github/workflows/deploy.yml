@@ -1,0 +1,39 @@
+# Deploy to the SiteGround site on every push to main.
+# Uses plain ssh/rsync (no third-party actions). SiteGround SSH runs on port 18765, key auth only.
+#
+# Repo secrets to add (GitHub -> Settings -> Secrets and variables -> Actions):
+#   SG_HOST     SiteGround SSH hostname (Site Tools -> Devs -> SSH Keys Manager -> "SSH credentials")
+#   SG_USER     SiteGround SSH username
+#   SG_SSH_KEY  private key created in SSH Keys Manager (paste the whole key)
+#   SG_PATH     the site's web root on SiteGround, e.g. www/<site domain>/public_html
+name: Deploy to SiteGround
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-siteground
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SG_SSH_KEY }}" > ~/.ssh/id_sg
+          chmod 600 ~/.ssh/id_sg
+          ssh-keyscan -p 18765 "${{ secrets.SG_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Upload files
+        # No --delete: files already on the server that are not in the repo are left alone.
+        run: |
+          rsync -avz \
+            --exclude '.git/' --exclude '.github/' --exclude 'README.md' \
+            -e "ssh -p 18765 -i ~/.ssh/id_sg" \
+            ./ "${{ secrets.SG_USER }}@${{ secrets.SG_HOST }}:${{ secrets.SG_PATH }}/"
