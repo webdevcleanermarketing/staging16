@@ -815,7 +815,7 @@ a.svc-card:hover .svc-more svg { transform: translateX(5px); }
 .offer-card-head small { display: block; font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--crimson); }
 .offer-card-head > div strong { font: 800 24px var(--font-head); letter-spacing: -.02em; }
 .offer-card .offer-badge { width: 68px; height: 68px; }
-.offer-form iframe { width: 100%; border: 0; display: block; }
+.offer-form iframe { width: 100%; border: 0; display: block; min-height: 480px; } /* form_embed.js sets the real height */
 .offer-form-fallback p { color: var(--muted); }
 @media (max-width: 1024px) {
   .offer-hero .container { grid-template-columns: minmax(0, 1fr); }
