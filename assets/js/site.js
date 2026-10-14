@@ -294,6 +294,23 @@
     });
   });
 
+  /* ---- new-customer offer: dismissible top bar (remembered on this device) + click tracking ---- */
+  const bar = $('[data-offer-bar]');
+  if (bar) {
+    try { if (localStorage.getItem('bellOfferBarHidden') === '1') bar.classList.add('is-dismissed'); } catch (e) { /* storage blocked */ }
+    $('[data-offer-close]', bar)?.addEventListener('click', () => {
+      bar.classList.add('is-dismissed');
+      try { localStorage.setItem('bellOfferBarHidden', '1'); } catch (e) { /* storage blocked */ }
+    });
+  }
+  // sends an "offer_click" event with where it was clicked, once GA4 / Tag Manager is added
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-offer-cta]');
+    if (!a) return;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'offer_click', offer_location: a.dataset.offerCta });
+  });
+
   /* ---- footer year ---- */
   $$('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
 

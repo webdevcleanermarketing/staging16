@@ -5,14 +5,22 @@
     <div>
       <span class="hero-chip"><i>{{icon:sparkle}}</i>Clothing Care on Your Terms</span>
       <div class="slides-text">
-        <div class="slide-text is-active" aria-roledescription="slide" aria-label="1 of 3">
+        <div class="slide-text is-active" aria-roledescription="slide" aria-label="1 of 4">
+          <h2 class="h-display"><span class="offer-num">33%</span> Off Your <span class="script">First Order</span></h2>
+          <p class="lead">New to Bell Laundry &amp; Cleaners? Claim 33% off your first order of professional garment care from a Sanitone Certified Master Dry Cleaner.</p>
+          <div class="btn-row">
+            <a class="btn" style="--i:0" href="/new-customer/" data-offer-cta="hero">Claim 33% Off <span class="btn-ico">{{icon:arrow}}</span></a>
+            <a class="btn btn-ghost" style="--i:1" href="/services/">Explore Our Services <span class="btn-ico">{{icon:sparkle}}</span></a>
+          </div>
+        </div>
+        <div class="slide-text" aria-roledescription="slide" aria-label="2 of 4" aria-hidden="true">
           <h2 class="h-display">Fresh Clothes. <span class="script">One Less Errand.</span></h2>
           <p class="lead">Pickup and delivery from Bell Laundry &amp; Cleaners keeps your cleaning on track without adding another stop to your week.</p>
           <div class="btn-row">
-            <a class="btn" style="--i:0" href="{{signup}}" target="_blank" rel="noopener">Sign Up for Pickup and Delivery <span class="btn-ico">{{icon:arrow}}</span></a>
+            <a class="btn" style="--i:0" href="{{signup}}" target="_blank" rel="noopener" tabindex="-1">Sign Up for Pickup and Delivery <span class="btn-ico">{{icon:arrow}}</span></a>
           </div>
         </div>
-        <div class="slide-text" aria-roledescription="slide" aria-label="2 of 3" aria-hidden="true">
+        <div class="slide-text" aria-roledescription="slide" aria-label="3 of 4" aria-hidden="true">
           <h2 class="h-display">Your Favorite Clothes Deserve <span class="script">Experienced Care</span></h2>
           <p class="lead">Choose a Sanitone Certified Master Dry Cleaner offering professional garment care and expert wet cleaning in Spartanburg.</p>
           <div class="btn-row">
@@ -20,7 +28,7 @@
             <a class="btn btn-ghost" style="--i:1" href="#visit" tabindex="-1">Find Our Store <span class="btn-ico">{{icon:pin}}</span></a>
           </div>
         </div>
-        <div class="slide-text" aria-roledescription="slide" aria-label="3 of 3" aria-hidden="true">
+        <div class="slide-text" aria-roledescription="slide" aria-label="4 of 4" aria-hidden="true">
           <h2 class="h-display">A Busy Day Doesn't Always Leave <span class="script">Time to Wait</span></h2>
           <p class="lead">Same-day service is available at Bell. Call ahead, tell us your deadline, and we'll let you know when to bring your order in.</p>
           <div class="btn-row">
@@ -29,16 +37,18 @@
         </div>
       </div>
       <div class="slide-nav" role="tablist" aria-label="Choose a highlight">
-        <button class="slide-tab is-active" type="button" role="tab" aria-selected="true"><b>01</b>Pickup &amp; Delivery</button>
-        <button class="slide-tab" type="button" role="tab" aria-selected="false"><b>02</b>Expert Care</button>
-        <button class="slide-tab" type="button" role="tab" aria-selected="false"><b>03</b>Same-Day Service</button>
+        <button class="slide-tab is-active" type="button" role="tab" aria-selected="true"><b>01</b>New Customers</button>
+        <button class="slide-tab" type="button" role="tab" aria-selected="false"><b>02</b>Pickup &amp; Delivery</button>
+        <button class="slide-tab" type="button" role="tab" aria-selected="false"><b>03</b>Expert Care</button>
+        <button class="slide-tab" type="button" role="tab" aria-selected="false"><b>04</b>Same-Day Service</button>
       </div>
     </div>
 
     <div class="hero-media">
       <span class="arch-outline" aria-hidden="true"></span>
       <div class="arch">
-        <div class="slide-img is-active"><img src="/assets/img/hero-pickup.webp" width="1500" height="692" alt="Bell Laundry &amp; Cleaners delivery van" fetchpriority="high"></div>
+        <div class="slide-img is-active"><img src="/assets/img/bags-bell.webp" width="1200" height="800" alt="Finished orders in Bell bags" fetchpriority="high"></div>
+        <div class="slide-img"><img src="/assets/img/hero-pickup.webp" width="1500" height="692" alt="Bell Laundry &amp; Cleaners delivery van" loading="lazy"></div>
         <div class="slide-img"><img src="/assets/img/hero-care.webp" width="1500" height="1000" alt="Cleaned garments in Bell bags on the conveyor" loading="lazy"></div>
         <div class="slide-img"><img src="/assets/img/hero-sameday.webp" width="1500" height="1000" alt="Finished orders hanging inside the Bell store" loading="lazy"></div>
       </div>
@@ -106,6 +116,8 @@
     </div>
   </div>
 </section>
+
+{{offer_strip}}
 
 <section class="section-tight" style="padding-top:0">
   <div class="container">

@@ -22,7 +22,7 @@ PAGES = {
         'path': '/',
         'title': 'Dry Cleaners in Spartanburg, SC | Bell Laundry & Cleaners',
         'description': 'Choose Bell Laundry & Cleaners in Spartanburg, SC, for dry cleaning, laundry, alterations, and pickup and delivery. Caring for your clothing since 1941.',
-        'preload': '/assets/img/hero-pickup.webp',
+        'preload': '/assets/img/bags-bell.webp',
     },
     'about': {
         'path': '/about-us/', 'crumb': 'About Us',
@@ -49,7 +49,34 @@ PAGES = {
         'title': 'Work With Us | Bell Laundry & Cleaners, Spartanburg',
         'description': 'Interested in joining Bell Laundry & Cleaners in Spartanburg, SC? Share your experience, availability, and resume through our online employment inquiry form.',
     },
+    'new-customer': {
+        'path': '/new-customer/', 'crumb': 'New Customer Offer',
+        'title': '33% Off Your First Order | Bell Laundry & Cleaners',
+        'description': 'New to Bell Laundry & Cleaners in Spartanburg, SC? Claim 33% off your first order of dry cleaning, laundry, and more. Fill out the form to get started.',
+    },
+    'thank-you': {
+        'path': '/thank-you/', 'crumb': 'Thank You', 'sitemap': False,
+        'title': 'Thank You | Bell Laundry & Cleaners',
+        'description': 'Thank you for claiming 33% off your first order at Bell Laundry & Cleaners in Spartanburg, SC.',
+    },
 }
+
+OFFER_PAGES = ('new-customer', 'thank-you')
+OFFER_STRIP = '''<section class="offer-strip-wrap">
+  <div class="container">
+    <a class="offer-strip" href="/new-customer/" data-offer-cta="strip" data-reveal="up">
+      <span class="offer-badge"><strong>33%</strong><span>Off</span></span>
+      <span class="offer-strip-text"><small>New to Bell Laundry &amp; Cleaners?</small><strong>33% Off Your First Order</strong></span>
+      <span class="btn">Claim Offer <span class="btn-ico"><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></span>
+    </a>
+  </div>
+</section>'''
+OFFER_BAR = '''<div class="offer-bar" data-offer-bar>
+  <div class="container">
+    <a href="/new-customer/" data-offer-cta="top-bar"><span class="offer-tag">New customers</span><strong>33% Off Your First Order</strong><span class="offer-go">Claim offer <svg aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
+    <button type="button" class="offer-close" aria-label="Hide offer" data-offer-close><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+</div>'''
 
 NAV = [
     ('home', 'Home', '/'),
@@ -201,6 +228,11 @@ def render(key, meta, layout, icons, versions, body=None, nav_key=None):
     if body is None:
         body = (SRC / 'pages' / f'{key}.html').read_text(encoding='utf-8')
         body = body.replace('{{blog_posts}}', blog_cards() if '{{blog_posts}}' in body else '')
+    body = body.replace('{{offer_form}}', (SRC / 'offer-form.html').read_text(encoding='utf-8').strip())
+    body = body.replace('{{offer_strip}}', OFFER_STRIP)
+    body = body.replace('{{service_links}}', '\n'.join(
+        f'      <a class="rel-link" href="/{s}/"><span class="svc-ico">{icon(ic)}</span><span>{html.escape(n)}</span>{icon("arrow")}</a>'
+        for s, n, ic in SERVICE_MENU))
     nav_key = nav_key or key
     if not meta.get('faq') and '<details' in body:
         # hand-written pages: read the questions and answers off the accordion itself
@@ -233,6 +265,7 @@ def render(key, meta, layout, icons, versions, body=None, nav_key=None):
         'nav': '\n'.join(nav),
         'nav_mobile': '\n'.join(nav_m),
         'content': body,
+        'offer_bar': '' if key in OFFER_PAGES else OFFER_BAR,
         'v_css': versions['css'],
         'v_js': versions['js'],
     }.items():
@@ -274,7 +307,7 @@ def main():
         nav_key = 'pickup-delivery' if slug == 'pickup-delivery' else ('services' if page in services else None)
         render(slug, meta, layout, icons, versions, body=render_service(page, services), nav_key=nav_key)
     # sitemap for the production domain (staging itself stays robots-disallowed)
-    paths = [m['path'] for m in PAGES.values()] + [f'/{p["slug"]}/' for p in services + locations]
+    paths = [m['path'] for m in PAGES.values() if m.get('sitemap', True)] + [f'/{p["slug"]}/' for p in services + locations]
     today = date.today().isoformat()
     urls = '\n'.join(f'  <url><loc>{BASE}{p}</loc><lastmod>{today}</lastmod></url>' for p in paths)
     (ROOT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

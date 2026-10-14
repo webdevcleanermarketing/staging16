@@ -533,6 +533,7 @@ def render_page(page, all_pages):
         k = kind(sec, i, last)
         if k == 'hero':
             out.append(render_hero(page, sec))
+            out.append('{{offer_strip}}')  # new-customer offer, filled in by build.py
         elif k == 'visit':
             out.append(render_visit(page, sec, sec['band']))
         elif k == 'faq':
