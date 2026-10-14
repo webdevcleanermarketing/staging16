@@ -5,7 +5,12 @@ timeline, "FAQ" headings the accordion, the store block the visit card + map, h3
 become cards, and so on. The copy itself is used as supplied.
 """
 import html
+import json
+import pathlib
 import re
+
+# CC0 / public-domain stock photos (source and license per file)
+STOCK = json.loads((pathlib.Path(__file__).resolve().parent.parent / 'assets' / 'img' / 'stock' / 'CREDITS.json').read_text(encoding='utf-8'))
 
 SIGNUP = 'https://belllaundryanddrycleaning.smrtapp.com/customer/'
 MAPS = 'https://maps.google.com/?q=Bell+Laundry+%26+Cleaners+448+Marion+Ave+Spartanburg+SC+29306'
@@ -52,17 +57,17 @@ ICON = {
 PHOTOS = {
     'services': ['wall-flag', 'conveyor-bags', 'sign-sanitone', 'threads', 'bags-bell'],
     'dry-cleaning': ['hero-care', 'conveyor-bags', 'conveyor-warm', 'bags-bell', 'sign-sanitone', 'conveyor-bw'],
-    'laundry-wash-and-fold': ['bags-bell', 'conveyor-bw', 'hero-sameday', 'bags-pink', 'team-van'],
+    'laundry-wash-and-fold': ['stock/laundry-folded', 'stock/laundry-hangers', 'stock/laundry-laundromat', 'stock/laundry-basket', 'bags-bell'],
     'pickup-delivery': ['hero-pickup', 'team-van', 'storefront', 'bags-bell', 'conveyor-warm'],
-    'alterations': ['sewing', 'threads', 'service-note', 'hero-sameday', 'wall-1941'],
-    'wedding-dress-cleaning-preservation': ['hero-sameday', 'bags-pink', 'conveyor-warm', 'threads', 'building'],
-    'comforter-household-cleaning': ['bags-bell', 'conveyor-bw', 'building', 'bags-pink', 'team-van'],
-    'tablecloth-linen-cleaning': ['hero-sameday', 'bags-pink', 'conveyor-bags', 'wall-1941', 'bags-bell'],
-    'leather-suede-cleaning': ['hero-care', 'sewing', 'conveyor-warm', 'service-note', 'storefront'],
-    'stain-removal-specialty-garment-care': ['bags-pink', 'conveyor-bags', 'threads', 'hero-care', 'sign-sanitone'],
-    'shirt-laundry-professional-pressing': ['conveyor-bw', 'hero-care', 'bags-bell', 'conveyor-warm', 'storefront'],
-    'business-commercial-laundry': ['building', 'team-van', 'conveyor-bags', 'hero-pickup', 'bags-bell'],
-    'shoe-repair': ['threads', 'sewing', 'service-note', 'storefront', 'wall-1941'],
+    'alterations': ['sewing', 'stock/alt-tailor', 'stock/alt-scissors', 'threads', 'service-note'],
+    'wedding-dress-cleaning-preservation': ['stock/wedding-hanging', 'stock/wedding-lace', 'stock/wedding-window', 'stock/wedding-rack', 'stock/wedding-gown'],
+    'comforter-household-cleaning': ['stock/comforter-bed', 'stock/comforter-reading', 'stock/biz-towel-stack', 'stock/comforter-room', 'bags-bell'],
+    'tablecloth-linen-cleaning': ['stock/table-reception', 'stock/table-napkins', 'stock/table-dining', 'stock/table-long', 'stock/table-white'],
+    'leather-suede-cleaning': ['stock/leather-rack', 'stock/leather-detail', 'stock/leather-wearing', 'stock/leather-group', 'sewing'],
+    'stain-removal-specialty-garment-care': ['stock/shirt-white', 'bags-pink', 'stock/table-napkins', 'stock/biz-towels', 'conveyor-bags'],
+    'shirt-laundry-professional-pressing': ['stock/shirt-display', 'stock/laundry-hangers', 'stock/shirt-suitcase', 'stock/shirt-line', 'conveyor-bw'],
+    'business-commercial-laundry': ['stock/biz-laundromat', 'stock/biz-towels', 'stock/biz-kitchen', 'stock/biz-towel-stack', 'team-van'],
+    'shoe-repair': ['stock/shoe-brogues', 'stock/shoe-row', 'stock/shoe-black', 'stock/shoe-woven', 'stock/shoe-boots'],
     'location': ['wall-1941', 'sign-sanitone', 'building', 'hero-sameday', 'conveyor-bags', 'storefront'],
     'service-areas': ['hero-pickup', 'team-van', 'wall-flag', 'bags-bell', 'conveyor-warm'],
 }
@@ -77,6 +82,24 @@ def next_photo(slug):
     return pool[1 + (i - 1) % (len(pool) - 1)]
 
 PHOTO_ALT = {
+    'stock/alt-tailor': 'Tailor sewing at a machine', 'stock/alt-scissors': 'Tailoring shears, thread and buttons',
+    'stock/wedding-hanging': 'Wedding dress hanging in a bright hallway', 'stock/wedding-lace': 'Close-up of wedding gown lace',
+    'stock/wedding-window': 'Wedding gown hanging by a window', 'stock/wedding-rack': 'Wedding dresses on a rack',
+    'stock/wedding-gown': 'Wedding gown on display', 'stock/laundry-folded': 'Stack of neatly folded clothes',
+    'stock/laundry-hangers': 'Fresh shirts on wooden hangers', 'stock/laundry-laundromat': 'Rows of washers and dryers',
+    'stock/laundry-basket': 'Woven laundry basket', 'stock/comforter-bed': 'Bed made with a fresh white comforter',
+    'stock/comforter-reading': 'Relaxing on fresh white bedding', 'stock/comforter-room': 'Bedroom with clean bedding',
+    'stock/biz-towel-stack': 'Stack of folded linens', 'stock/table-reception': 'Tables set with white tablecloths',
+    'stock/table-napkins': 'Table set with folded cloth napkins', 'stock/table-dining': 'Dining table with a white tablecloth',
+    'stock/table-long': 'Long banquet table with white linens', 'stock/table-white': 'Table laid with white linens',
+    'stock/leather-rack': 'Leather jackets on a rack', 'stock/leather-detail': 'Close-up of a leather jacket zipper',
+    'stock/leather-wearing': 'Person wearing a leather jacket', 'stock/leather-group': 'Friends wearing jackets',
+    'stock/shirt-white': 'Crisp white dress shirt', 'stock/shirt-display': 'Pressed collared shirts on display',
+    'stock/shirt-suitcase': 'Folded striped dress shirt', 'stock/shirt-line': 'Shirts hanging in a row',
+    'stock/biz-laundromat': 'Commercial washers and dryers', 'stock/biz-towels': 'Folded white towels',
+    'stock/biz-kitchen': 'Busy restaurant kitchen', 'stock/shoe-brogues': 'Brown leather brogues',
+    'stock/shoe-row': 'Row of leather dress shoes', 'stock/shoe-black': 'Polished black leather shoes',
+    'stock/shoe-woven': 'Woven leather shoes', 'stock/shoe-boots': 'Leather work boots',
     'wall-1941': 'Painted Bell sign: Certified Master Dry Cleaner, Since 1941',
     'wall-flag': 'Bell building with the painted Bell script',
     'conveyor-bags': 'Garments in Bell bags on the conveyor',
@@ -127,6 +150,8 @@ def card_icon(title):
 
 
 def img(name, cls='', eager=False, alt=None):
+    if name.startswith('stock/') and name[6:] in STOCK:
+        PHOTO_SIZE[name] = tuple(STOCK[name[6:]]['size'])
     w, h = PHOTO_SIZE.get(name, (1200, 800) if name not in ('hero-care', 'hero-sameday', 'wall-flag', 'building') else (1500, 1000))
     alt = PHOTO_ALT.get(name, '') if alt is None else alt
     load = 'fetchpriority="high"' if eager else 'loading="lazy"'
