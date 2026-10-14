@@ -11,7 +11,7 @@ import pathlib
 import re
 from datetime import date
 
-from services_render import SHORT as SHORT_NAMES, render_page as render_service
+from services_render import ICON as SERVICE_ICONS, SHORT as SHORT_NAMES, render_page as render_service
 
 SRC = pathlib.Path(__file__).resolve().parent
 ROOT = SRC.parent
@@ -166,6 +166,37 @@ def faq_pairs(page):
     return [(q, ' '.join(a)) for q, a in pairs if a]
 
 
+SERVICE_MENU = []  # (slug, name, icon), filled from services.json in main()
+
+
+def services_menu(key, cur):
+    """Desktop Services item: link to the hub plus a dropdown of every service page."""
+    links = '\n'.join(
+        f'            <li><a href="/{s}/"{" aria-current=\"page\"" if s == key else ""}>'
+        f'<span class="mi">{icon(ic)}</span>{html.escape(n)}</a></li>' for s, n, ic in SERVICE_MENU)
+    return f'''        <li class="has-menu">
+          <a href="/services/"{cur}>Services</a>
+          <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="services-menu" aria-label="Show all services">{icon('arrow')}</button>
+          <div class="mega" id="services-menu">
+            <ul>
+{links}
+            </ul>
+            <a class="mega-all" href="/services/">View all services {icon('arrow')}</a>
+          </div>
+        </li>'''
+
+
+def services_menu_mobile(key, cur, i):
+    links = '\n'.join(f'        <li><a href="/{s}/"{" aria-current=\"page\"" if s == key else ""}>{html.escape(n)}</a></li>'
+                      for s, n, ic in SERVICE_MENU)
+    return f'''    <li style="--i:{i}" class="has-sub">
+      <div class="sub-row"><a href="/services/"{cur}>Services</a><button class="sub-toggle" type="button" aria-expanded="false" aria-controls="m-services" aria-label="Show all services">{icon('arrow')}</button></div>
+      <ul class="sub" id="m-services">
+{links}
+      </ul>
+    </li>'''
+
+
 def render(key, meta, layout, icons, versions, body=None, nav_key=None):
     if body is None:
         body = (SRC / 'pages' / f'{key}.html').read_text(encoding='utf-8')
@@ -178,6 +209,10 @@ def render(key, meta, layout, icons, versions, body=None, nav_key=None):
     nav, nav_m = [], []
     for i, (k, label, href) in enumerate(NAV):
         cur = ' aria-current="page"' if k == nav_key else ''
+        if k == 'services' and SERVICE_MENU:
+            nav.append(services_menu(key, cur))
+            nav_m.append(services_menu_mobile(key, cur, i))
+            continue
         nav.append(f'        <li><a href="{href}"{cur}>{html.escape(label)}</a></li>')
         nav_m.append(f'    <li style="--i:{i}"><a href="{href}"{cur}>{html.escape(label)}</a></li>')
     for j, (label, href) in enumerate([('Media Room', '/media-room/'), ('Work With Us', '/work-with-us/')]):
@@ -214,6 +249,9 @@ def render(key, meta, layout, icons, versions, body=None, nav_key=None):
 
 
 def main():
+    for p in json.loads((SRC / 'services.json').read_text(encoding='utf-8')):
+        if p['slug'] != 'services':
+            SERVICE_MENU.append((p['slug'], SHORT_NAMES[p['slug']], SERVICE_ICONS[p['slug']]))
     layout = (SRC / 'layout.html').read_text(encoding='utf-8')
     icons = (SRC / 'icons.svg').read_text(encoding='utf-8').strip()
     versions = {

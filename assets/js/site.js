@@ -201,6 +201,30 @@
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && doc.classList.contains('menu-open')) { setMenu(false); burger?.focus(); } });
   addEventListener('resize', () => { if (innerWidth > 1024 && doc.classList.contains('menu-open')) setMenu(false); });
 
+  /* ---- services dropdown (desktop): opens on hover/focus, the arrow toggles it for touch and keyboard ---- */
+  $$('.has-menu').forEach((item) => {
+    const btn = $('.menu-toggle', item);
+    const set = (open) => {
+      item.classList.toggle('is-open', open);
+      item.classList.toggle('is-closed', !open && item.matches(':focus-within'));
+      btn.setAttribute('aria-expanded', String(open));
+    };
+    btn.addEventListener('click', (e) => { e.stopPropagation(); set(!item.classList.contains('is-open')); });
+    item.addEventListener('mouseleave', () => { item.classList.remove('is-closed'); });
+    item.addEventListener('focusin', () => item.classList.remove('is-closed'));
+    document.addEventListener('click', (e) => { if (!item.contains(e.target)) set(false); });
+    item.addEventListener('keydown', (e) => { if (e.key === 'Escape') { set(false); btn.focus(); } });
+  });
+  /* mobile menu: expandable services list */
+  $$('.has-sub').forEach((item) => {
+    const btn = $('.sub-toggle', item);
+    btn.addEventListener('click', () => {
+      const open = !item.classList.contains('is-open');
+      item.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  });
+
   /* ---- service card spotlight ---- */
   if (finePointer && !reduce) {
     $$('.svc-card').forEach((card) => card.addEventListener('pointermove', (e) => {

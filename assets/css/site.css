@@ -157,6 +157,41 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 }
 .nav a:hover, .nav a[aria-current="page"] { color: var(--white); background: rgba(255, 255, 255, .07); }
 .nav a[aria-current="page"]::after { content: ""; position: absolute; left: 50%; bottom: 3px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--gold); }
+/* services dropdown */
+.nav .has-menu { position: relative; display: flex; align-items: center; }
+.nav .has-menu > a { padding-right: 6px; }
+.menu-toggle { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; color: #eadbd6; margin-right: 4px; transition: background .25s, color .25s; }
+.menu-toggle svg { width: 13px; height: 13px; transform: rotate(90deg); transition: transform .35s var(--ease); }
+.menu-toggle:hover { background: rgba(255, 255, 255, .1); color: var(--white); }
+.has-menu.is-open .menu-toggle svg, .has-menu:hover .menu-toggle svg { transform: rotate(-90deg); }
+.mega {
+  position: absolute; top: calc(100% + 14px); left: 50%; width: 600px; z-index: 60;
+  background: var(--white); color: var(--ink); border-radius: 24px; padding: 14px; box-shadow: 0 30px 70px -20px rgba(22, 6, 10, .55);
+  opacity: 0; visibility: hidden; transform: translate(-50%, 10px); transition: opacity .3s var(--ease), transform .4s var(--ease), visibility 0s .4s;
+}
+.mega::before { content: ""; position: absolute; left: 0; right: 0; top: -16px; height: 16px; } /* hover bridge */
+.has-menu:hover .mega, .has-menu:focus-within .mega, .has-menu.is-open .mega { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity .3s var(--ease), transform .4s var(--ease), visibility 0s; }
+.has-menu.is-closed .mega { opacity: 0; visibility: hidden; }
+.mega ul { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+.nav .mega a { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 14px; color: var(--ink); font: 600 15px var(--font-head); background: none; }
+.nav .mega a::after { display: none; }
+.nav .mega a:hover, .nav .mega a[aria-current="page"] { background: var(--sand); color: var(--crimson); }
+.mega .mi { width: 36px; height: 36px; flex: none; border-radius: 50%; background: var(--wine-900); color: var(--gold); display: grid; place-items: center; transition: background .3s, color .3s; }
+.mega .mi svg { width: 17px; height: 17px; }
+.nav .mega a:hover .mi { background: var(--crimson); color: var(--white); }
+.nav .mega .mega-all { justify-content: center; margin-top: 8px; padding: 12px; background: var(--wine-900); color: var(--white); border-radius: 14px; }
+.nav .mega .mega-all svg { width: 15px; height: 15px; color: var(--gold); }
+.nav .mega .mega-all:hover { background: var(--crimson); color: var(--white); }
+.mobile-menu .sub-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.mobile-menu .sub-row a { border-bottom: 0; flex: 1; }
+.sub-toggle { width: 46px; height: 46px; border-radius: 50%; background: rgba(255, 255, 255, .08); color: var(--gold); display: grid; place-items: center; flex: none; }
+.sub-toggle svg { width: 18px; height: 18px; transform: rotate(90deg); transition: transform .35s var(--ease); }
+.has-sub.is-open .sub-toggle svg { transform: rotate(-90deg); }
+.mobile-menu .sub > li { opacity: 1; transform: none; }
+.mobile-menu .sub { overflow: hidden; max-height: 0; transition: max-height .5s var(--ease); }
+.mobile-menu .has-sub.is-open .sub { max-height: 900px; }
+.mobile-menu .sub a { font: 600 18px/1.3 var(--font-head); padding: 10px 0 10px 16px; color: #e6d3cf; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+.mobile-menu .sub a[aria-current="page"] { color: var(--gold); }
 .header-call { display: flex; align-items: center; gap: 12px; color: var(--white); flex: none; }
 .header-call .ring { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .25); display: grid; place-items: center; color: var(--gold); transition: background .3s, border-color .3s; }
 .header-call:hover .ring { background: var(--gold); color: var(--wine-900); border-color: var(--gold); }

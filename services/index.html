@@ -21,9 +21,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Urbanist:wght@600;700;800&display=swap">
-<link rel="stylesheet" href="/assets/css/site.css?v=cb43c621">
+<link rel="stylesheet" href="/assets/css/site.css?v=9dd0770a">
 
-<script src="/assets/js/site.js?v=d61941d5" defer></script>
+<script src="/assets/js/site.js?v=a19d9015" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://bellcleaners.com/"},{"@type":"ListItem","position":2,"name":"Our Services","item":"https://bellcleaners.com/services/"}]}</script>
 </head>
 <body>
@@ -82,7 +82,27 @@
       <ul>
         <li><a href="/">Home</a></li>
         <li><a href="/about-us/">About</a></li>
-        <li><a href="/services/" aria-current="page">Services</a></li>
+        <li class="has-menu">
+          <a href="/services/" aria-current="page">Services</a>
+          <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="services-menu" aria-label="Show all services"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <div class="mega" id="services-menu">
+            <ul>
+            <li><a href="/dry-cleaning/"><span class="mi"><svg aria-hidden="true"><use href="#i-hanger"/></svg></span>Dry Cleaning</a></li>
+            <li><a href="/laundry-wash-and-fold/"><span class="mi"><svg aria-hidden="true"><use href="#i-washer"/></svg></span>Laundry &amp; Wash and Fold</a></li>
+            <li><a href="/pickup-delivery/"><span class="mi"><svg aria-hidden="true"><use href="#i-truck"/></svg></span>Pickup &amp; Delivery</a></li>
+            <li><a href="/alterations/"><span class="mi"><svg aria-hidden="true"><use href="#i-scissors"/></svg></span>Alterations &amp; Tailoring</a></li>
+            <li><a href="/wedding-dress-cleaning-preservation/"><span class="mi"><svg aria-hidden="true"><use href="#i-dress"/></svg></span>Wedding Dress Cleaning</a></li>
+            <li><a href="/comforter-household-cleaning/"><span class="mi"><svg aria-hidden="true"><use href="#i-blanket"/></svg></span>Comforter &amp; Household</a></li>
+            <li><a href="/tablecloth-linen-cleaning/"><span class="mi"><svg aria-hidden="true"><use href="#i-table"/></svg></span>Tablecloths &amp; Linens</a></li>
+            <li><a href="/leather-suede-cleaning/"><span class="mi"><svg aria-hidden="true"><use href="#i-jacket"/></svg></span>Leather &amp; Suede</a></li>
+            <li><a href="/stain-removal-specialty-garment-care/"><span class="mi"><svg aria-hidden="true"><use href="#i-drop"/></svg></span>Stain Removal &amp; Specialty Care</a></li>
+            <li><a href="/shirt-laundry-professional-pressing/"><span class="mi"><svg aria-hidden="true"><use href="#i-shirt"/></svg></span>Shirt Laundry &amp; Pressing</a></li>
+            <li><a href="/business-commercial-laundry/"><span class="mi"><svg aria-hidden="true"><use href="#i-building"/></svg></span>Business &amp; Commercial</a></li>
+            <li><a href="/shoe-repair/"><span class="mi"><svg aria-hidden="true"><use href="#i-shoe"/></svg></span>Shoe Repair</a></li>
+            </ul>
+            <a class="mega-all" href="/services/">View all services <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          </div>
+        </li>
         <li><a href="/pickup-delivery/">Pickup &amp; Delivery</a></li>
         <li><a href="/blog/">Blog</a></li>
         <li><a href="/contact/">Contact</a></li>
@@ -101,7 +121,23 @@
   <ul>
     <li style="--i:0"><a href="/">Home</a></li>
     <li style="--i:1"><a href="/about-us/">About</a></li>
-    <li style="--i:2"><a href="/services/" aria-current="page">Services</a></li>
+    <li style="--i:2" class="has-sub">
+      <div class="sub-row"><a href="/services/" aria-current="page">Services</a><button class="sub-toggle" type="button" aria-expanded="false" aria-controls="m-services" aria-label="Show all services"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+      <ul class="sub" id="m-services">
+        <li><a href="/dry-cleaning/">Dry Cleaning</a></li>
+        <li><a href="/laundry-wash-and-fold/">Laundry &amp; Wash and Fold</a></li>
+        <li><a href="/pickup-delivery/">Pickup &amp; Delivery</a></li>
+        <li><a href="/alterations/">Alterations &amp; Tailoring</a></li>
+        <li><a href="/wedding-dress-cleaning-preservation/">Wedding Dress Cleaning</a></li>
+        <li><a href="/comforter-household-cleaning/">Comforter &amp; Household</a></li>
+        <li><a href="/tablecloth-linen-cleaning/">Tablecloths &amp; Linens</a></li>
+        <li><a href="/leather-suede-cleaning/">Leather &amp; Suede</a></li>
+        <li><a href="/stain-removal-specialty-garment-care/">Stain Removal &amp; Specialty Care</a></li>
+        <li><a href="/shirt-laundry-professional-pressing/">Shirt Laundry &amp; Pressing</a></li>
+        <li><a href="/business-commercial-laundry/">Business &amp; Commercial</a></li>
+        <li><a href="/shoe-repair/">Shoe Repair</a></li>
+      </ul>
+    </li>
     <li style="--i:3"><a href="/pickup-delivery/">Pickup &amp; Delivery</a></li>
     <li style="--i:4"><a href="/blog/">Blog</a></li>
     <li style="--i:5"><a href="/contact/">Contact</a></li>
