@@ -552,5 +552,7 @@ def render_page(page, all_pages):
         else:
             out.append(render_text(page, sec, text_n, sec['band']))
             text_n += 1
-    out.append(render_related(page, all_pages))
+    # pages that already show the full services grid don't need the "Explore More Services" strip
+    if not any(kind(sec, i, last) == 'hub' for i, sec in enumerate(secs)):
+        out.append(render_related(page, all_pages))
     return '\n\n'.join(out)
