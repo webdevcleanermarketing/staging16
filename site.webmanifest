@@ -1,0 +1,11 @@
+{
+  "name": "Bell Laundry & Cleaners",
+  "short_name": "Bell Cleaners",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#a6213d",
+  "background_color": "#fbf7f1",
+  "display": "browser"
+}

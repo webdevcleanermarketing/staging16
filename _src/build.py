@@ -11,6 +11,8 @@ import pathlib
 import re
 from datetime import date
 
+from services_render import render_page as render_service
+
 SRC = pathlib.Path(__file__).resolve().parent
 ROOT = SRC.parent
 SIGNUP = 'https://belllaundryanddrycleaning.smrtapp.com/customer/'
@@ -52,8 +54,8 @@ PAGES = {
 NAV = [
     ('home', 'Home', '/'),
     ('about', 'About', '/about-us/'),
-    (None, 'Services', '/#services'),
-    (None, 'Pickup & Delivery', '/#pickup'),
+    ('services', 'Services', '/services/'),
+    ('pickup-delivery', 'Pickup & Delivery', '/pickup-delivery/'),
     ('blog', 'Blog', '/blog/'),
     ('contact', 'Contact', '/contact/'),
 ]
@@ -116,12 +118,14 @@ def blog_cards():
     return '\n'.join(out)
 
 
-def render(key, meta, layout, icons, versions):
-    body = (SRC / 'pages' / f'{key}.html').read_text(encoding='utf-8')
-    body = body.replace('{{blog_posts}}', blog_cards() if '{{blog_posts}}' in body else '')
+def render(key, meta, layout, icons, versions, body=None, nav_key=None):
+    if body is None:
+        body = (SRC / 'pages' / f'{key}.html').read_text(encoding='utf-8')
+        body = body.replace('{{blog_posts}}', blog_cards() if '{{blog_posts}}' in body else '')
+    nav_key = nav_key or key
     nav, nav_m = [], []
     for i, (k, label, href) in enumerate(NAV):
-        cur = ' aria-current="page"' if k == key else ''
+        cur = ' aria-current="page"' if k == nav_key else ''
         nav.append(f'        <li><a href="{href}"{cur}>{html.escape(label)}</a></li>')
         nav_m.append(f'    <li style="--i:{i}"><a href="{href}"{cur}>{html.escape(label)}</a></li>')
     for j, (label, href) in enumerate([('Media Room', '/media-room/'), ('Work With Us', '/work-with-us/')]):
@@ -167,6 +171,11 @@ def main():
     }
     for key, meta in PAGES.items():
         render(key, meta, layout, icons, versions)
+    services = json.loads((SRC / 'services.json').read_text(encoding='utf-8'))
+    for page in services:
+        meta = {'path': f'/{page["slug"]}/', 'title': page['title'], 'description': page['description']}
+        nav_key = 'pickup-delivery' if page['slug'] == 'pickup-delivery' else 'services'
+        render(page['slug'], meta, layout, icons, versions, body=render_service(page, services), nav_key=nav_key)
 
 
 if __name__ == '__main__':
