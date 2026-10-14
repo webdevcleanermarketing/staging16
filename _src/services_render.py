@@ -24,6 +24,21 @@ SHORT = {
     'shirt-laundry-professional-pressing': 'Shirt Laundry & Pressing',
     'business-commercial-laundry': 'Business & Commercial',
     'shoe-repair': 'Shoe Repair',
+    'location': 'Our Location',
+    'service-areas': 'Service Areas',
+}
+# service names as the docs write them -> page slug
+NAME_TO_SLUG = {
+    'dry cleaning': 'dry-cleaning', 'laundry and wash and fold': 'laundry-wash-and-fold',
+    'laundry & wash and fold': 'laundry-wash-and-fold', 'alterations & tailoring': 'alterations',
+    'wedding dress cleaning and preservation': 'wedding-dress-cleaning-preservation',
+    'comforter & household cleaning': 'comforter-household-cleaning',
+    'tablecloths & linens cleaning service': 'tablecloth-linen-cleaning', 'leather & suede cleaning': 'leather-suede-cleaning',
+    'stain removal and specialty garment care': 'stain-removal-specialty-garment-care',
+    'stain removal & specialty garment care': 'stain-removal-specialty-garment-care',
+    'shirt laundry & professional pressing': 'shirt-laundry-professional-pressing',
+    'business & commercial laundry': 'business-commercial-laundry',
+    'commercial & business cleaning services': 'business-commercial-laundry', 'pickup and delivery': 'pickup-delivery',
 }
 ICON = {
     'dry-cleaning': 'hanger', 'laundry-wash-and-fold': 'washer', 'pickup-delivery': 'truck',
@@ -31,7 +46,7 @@ ICON = {
     'comforter-household-cleaning': 'blanket', 'tablecloth-linen-cleaning': 'table',
     'leather-suede-cleaning': 'jacket', 'stain-removal-specialty-garment-care': 'drop',
     'shirt-laundry-professional-pressing': 'shirt', 'business-commercial-laundry': 'building',
-    'shoe-repair': 'shoe', 'services': 'sparkle',
+    'shoe-repair': 'shoe', 'services': 'sparkle', 'location': 'pin', 'service-areas': 'truck',
 }
 # Bell's own photos, picked per page: [hero, second, third]
 PHOTOS = {
@@ -48,6 +63,8 @@ PHOTOS = {
     'shirt-laundry-professional-pressing': ['conveyor-bw', 'hero-care', 'bags-bell', 'conveyor-warm', 'storefront'],
     'business-commercial-laundry': ['building', 'team-van', 'conveyor-bags', 'hero-pickup', 'bags-bell'],
     'shoe-repair': ['threads', 'sewing', 'service-note', 'storefront', 'wall-1941'],
+    'location': ['wall-1941', 'sign-sanitone', 'building', 'hero-sameday', 'conveyor-bags', 'storefront'],
+    'service-areas': ['hero-pickup', 'team-van', 'wall-flag', 'bags-bell', 'conveyor-warm'],
 }
 _used = {}
 
@@ -80,7 +97,7 @@ PHOTO_ALT = {
 }
 PHOTO_SIZE = {'hero-pickup': (1500, 692), 'team-van': (1400, 495), 'storefront': (1500, 542), 'service-note': (900, 1162)}
 CARD_ICONS = [
-    (r'sanitone|certif|credential|quality', 'award'), (r'family|keepsake|memor|meaning|care that|matters', 'heart'),
+    (r'^spartanburg$|^greenville$', 'pin'), (r'sanitone|certif|credential|quality', 'award'), (r'family|keepsake|memor|meaning|care that|matters', 'heart'),
     (r'same-day|fast|quick', 'bolt'), (r'team|people|relationship|knows you|personal', 'users'),
     (r'talk|tell|communicat|conversation|ask|explain|describe|details|history|noticed', 'chat'),
     (r'schedule|monday|day|date|timing|week|prepare ahead|routine', 'calendar'), (r'turnaround|time|expect', 'clock'),
@@ -88,7 +105,7 @@ CARD_ICONS = [
     (r'tablecloth|napkin|linen', 'table'), (r'leather|suede|overcoat', 'jacket'), (r'shirt|press|iron', 'shirt'),
     (r'gown|bridal|dress|veil', 'dress'), (r'hem|sleeve|suit|blazer|tuxedo|denim|alter|restyl|resiz|fit', 'scissors'),
     (r'shoe|sole|heel|footwear|stretch|shine|fastener|zipper|recondition', 'shoe'),
-    (r'store|visit|marion', 'pin'), (r'pickup|picked up|deliver', 'truck'), (r'items|volume|location|business', 'building'),
+    (r'store|visit|marion|^spartanburg$|^greenville$', 'pin'), (r'pickup|picked up|deliver', 'truck'), (r'items|volume|location|business', 'building'),
     (r'stain|spill|mark|clean', 'drop'), (r'label|check', 'check'),
 ]
 
@@ -135,14 +152,19 @@ def map_button(b, variant):
     if 'maps' in href or 'directions' in low:
         href, ico = MAPS, 'pin'
         ext = ' target="_blank" rel="noopener"'
-    elif href.startswith('tel:') or low.startswith('call') or 'check service at your address' in low:
+    elif 'sign up' in low:
+        href, ico = SIGNUP, 'arrow'
+        ext = ' target="_blank" rel="noopener"'
+    elif href.startswith('tel:') or low.startswith('call') or low.startswith('check service'):
         href, ico = 'tel:+18645838668', 'phone'
     elif 'pickup and delivery' in low:
         href, ico = '/pickup-delivery/', 'truck'
+    elif low == 'explore our services':
+        href, ico = '/services/', 'arrow'
     elif low.startswith('explore '):
         href, ico = href, 'arrow'
     else:
-        href = '/contact/' if 'bellcleaners.com/contact' in href or href == '/contact/' else href
+        href = '/contact/' if not href or 'bellcleaners.com/contact' in href else href
         ico = 'arrow'
     return f'<a class="btn {variant}" href="{html.escape(href)}"{ext}>{esc(label)} <span class="btn-ico">{icon(ico)}</span></a>'
 
@@ -188,15 +210,15 @@ def kind(sec, idx, last_idx):
     labels = [i['label'] for i in items if i['t'] == 'btns' for i in i['list']]
     if idx == 0:
         return 'hero'
-    if any(re.match(r'Saturday', h) for h in h3s) or any(p.strip() in ('Store Hours:', 'Address:') for p in ps):
+    if any(re.match(r'Saturday', h) for h in h3s) or any(p.strip().startswith(('Store Hours:', 'Address:')) for p in ps):
         return 'visit'
-    if 'FAQ' in sec['heading']:
+    if 'FAQ' in sec['heading'] or 'Frequently Asked' in sec['heading']:
         return 'faq'
     if sum(1 for h in h3s if re.match(r'\d+\.\s', h)) >= 2:
         return 'steps'
     if 'Word From Our Customers' in sec['heading']:
         return 'review'
-    if sum(1 for l in labels if l.startswith('Explore ')) >= 4:
+    if sum(1 for l in labels if l.startswith('Explore ')) >= 4 or sum(1 for h in h3s if h.lower() in NAME_TO_SLUG) >= 4:
         return 'hub'
     if len(h3s) >= 2:
         return 'cards'
@@ -218,11 +240,11 @@ def render_hero(page, sec):
     ps = [it['html'] for it in sec['items'] if it['t'] == 'p']
     lead = f'<p class="lead" data-reveal="up">{ps[0]}</p>' if ps else ''
     crumbs = '<li><a href="/">Home</a></li>'
-    if page['slug'] != 'services':
+    if page['slug'] not in ('services', 'location', 'service-areas'):
         crumbs += '<li><a href="/services/">Services</a></li>'
         crumbs += f'<li>{esc(SHORT[page["slug"]])}</li>'
     else:
-        crumbs += '<li>Services</li>'
+        crumbs += f'<li>{esc(SHORT.get(page["slug"], "Services"))}</li>'
     btns = buttons(sec['items'], dark_first=False, on_dark=True)
     hero = f'''<section class="page-hero svc-hero">
   <span class="sparkle" style="left:6%;top:18%;width:18px;height:18px">{icon('sparkle')}</span>
@@ -383,8 +405,8 @@ def render_visit(page, sec, band):
     for it in sec['items']:
         if it['t'] != 'p':
             continue
-        raw = re.sub(r'<[^>]+>', '', it['html']).strip()
-        if raw in ('Address:', 'Phone:', 'Store Hours:') or raw.startswith(('448 Marion', 'Monday through Friday', '864-583-8668', 'Bell Laundry')):
+        raw = html.unescape(re.sub(r'<[^>]+>', '', it['html'])).strip()
+        if raw in ('Address:', 'Phone:', 'Store Hours:') or raw.startswith(('448 Marion', 'Monday through Friday', '864-583-8668', 'Bell Laundry & Cleaners 448', 'Phone:', 'Store Hours:', 'Address:')) or raw == 'Bell Laundry & Cleaners':
             continue
         ps.append(it['html'])
     btns = buttons(sec['items'])
@@ -443,7 +465,7 @@ def render_hub(page, sec, all_pages):
                 by_label[b['label'].replace('Explore ', '', 1)] = b['href'].strip('/')
     cards = []
     for i, (title, body) in enumerate(grps):
-        slug = by_label.get(title) or next((s for s, n in SHORT.items() if n == title), '')
+        slug = by_label.get(title) or NAME_TO_SLUG.get(title.lower()) or next((s for s, n in SHORT.items() if n == title), '')
         feat = ' is-feature span-2' if i == 0 else (' is-gold span-2' if i == len(grps) - 1 and len(grps) % 4 == 2 else '')
         cards.append(f'''<a class="svc-card{feat}" href="/{slug}/">
         <div class="svc-top"><span class="svc-num">{i + 1:02d}</span><span class="svc-ico">{icon(ICON.get(slug, 'sparkle'))}</span></div>
@@ -459,6 +481,7 @@ def render_hub(page, sec, all_pages):
     <div class="svc-grid svc-grid-links" data-stagger=".05">
       {''.join(cards)}
     </div>
+    {f'<div class="tile-cta">{buttons(sec["items"])}</div>' if page['slug'] != 'services' else ''}
   </div>
 </section>'''
 

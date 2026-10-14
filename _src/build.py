@@ -11,7 +11,7 @@ import pathlib
 import re
 from datetime import date
 
-from services_render import render_page as render_service
+from services_render import SHORT as SHORT_NAMES, render_page as render_service
 
 SRC = pathlib.Path(__file__).resolve().parent
 ROOT = SRC.parent
@@ -25,27 +25,27 @@ PAGES = {
         'preload': '/assets/img/hero-pickup.webp',
     },
     'about': {
-        'path': '/about-us/',
+        'path': '/about-us/', 'crumb': 'About Us',
         'title': 'About Bell Laundry & Cleaners | Serving Since 1941',
         'description': 'Learn about Bell Laundry & Cleaners, a family-owned cleaner established in Spartanburg, SC, in 1941, offering quality garment care and personal service.',
     },
     'contact': {
-        'path': '/contact/',
+        'path': '/contact/', 'crumb': 'Contact',
         'title': 'Contact Bell Laundry & Cleaners | Spartanburg, SC',
         'description': 'Contact Bell Laundry & Cleaners in Spartanburg, SC, for dry cleaning, laundry, alterations, and pickup and delivery. Call or send our team a message today.',
     },
     'blog': {
-        'path': '/blog/',
+        'path': '/blog/', 'crumb': 'Blog',
         'title': 'Garment Care Blog | Bell Laundry & Cleaners',
         'description': 'Explore clothing care tips, laundry advice, and guidance for everyday garments and special pieces from Bell Laundry & Cleaners in Upstate South Carolina.',
     },
     'media': {
-        'path': '/media-room/',
+        'path': '/media-room/', 'crumb': 'Media Room',
         'title': 'Media Room | Bell Laundry & Cleaners',
         'description': 'Company news and updates from Bell Laundry & Cleaners, established in Spartanburg in 1941. For media inquiries, contact our team at 864-583-8668.',
     },
     'work': {
-        'path': '/work-with-us/',
+        'path': '/work-with-us/', 'crumb': 'Work With Us',
         'title': 'Work With Us | Bell Laundry & Cleaners, Spartanburg',
         'description': 'Interested in joining Bell Laundry & Cleaners in Spartanburg, SC? Share your experience, availability, and resume through our online employment inquiry form.',
     },
@@ -118,11 +118,63 @@ def blog_cards():
     return '\n'.join(out)
 
 
+BASE = 'https://bellcleaners.com'
+
+
+def plain(s):
+    return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', '', s))).strip()
+
+
+def page_schema(key, meta):
+    """JSON-LD for a page: the business on home/location, breadcrumbs on inner pages,
+    Service + FAQPage on content pages (FAQ text is exactly what the page shows)."""
+    out = []
+    if key in ('home', 'location'):
+        out.append(SCHEMA)
+    if meta['path'] != '/':
+        crumbs = [('Home', '/')]
+        if meta.get('parent'):
+            crumbs.append(meta['parent'])
+        crumbs.append((meta.get('crumb') or meta['title'].split(' | ')[0], meta['path']))
+        out.append({'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+            {'@type': 'ListItem', 'position': i + 1, 'name': n, 'item': BASE + p} for i, (n, p) in enumerate(crumbs)]})
+    if meta.get('service'):
+        out.append({'@context': 'https://schema.org', '@type': 'Service', 'name': meta['service'],
+                    'serviceType': meta['service'], 'description': meta['description'], 'url': BASE + meta['path'],
+                    'areaServed': {'@type': 'City', 'name': 'Spartanburg, SC'},
+                    'provider': {'@type': 'DryCleaningOrLaundry', 'name': SCHEMA['name'], 'url': SCHEMA['url'],
+                                 'telephone': SCHEMA['telephone'], 'address': SCHEMA['address']}})
+    if meta.get('faq'):
+        out.append({'@context': 'https://schema.org', '@type': 'FAQPage', 'mainEntity': [
+            {'@type': 'Question', 'name': q, 'acceptedAnswer': {'@type': 'Answer', 'text': a}} for q, a in meta['faq']]})
+    return out
+
+
+def faq_pairs(page):
+    """Question/answer pairs from a page's FAQ section."""
+    pairs = []
+    for sec in page['sections']:
+        if 'FAQ' not in sec['heading'] and 'Frequently Asked' not in sec['heading']:
+            continue
+        q = None
+        for it in sec['items']:
+            if it['t'] == 'h3':
+                q = [it['text'], []]
+                pairs.append(q)
+            elif it['t'] == 'p' and q:
+                q[1].append(plain(it['html']))
+    return [(q, ' '.join(a)) for q, a in pairs if a]
+
+
 def render(key, meta, layout, icons, versions, body=None, nav_key=None):
     if body is None:
         body = (SRC / 'pages' / f'{key}.html').read_text(encoding='utf-8')
         body = body.replace('{{blog_posts}}', blog_cards() if '{{blog_posts}}' in body else '')
     nav_key = nav_key or key
+    if not meta.get('faq') and '<details' in body:
+        # hand-written pages: read the questions and answers off the accordion itself
+        meta = dict(meta, faq=[(plain(q), plain(a)) for q, a in re.findall(
+            r'<summary>.*?</span>(.*?)</summary>\s*<div class="answer">(.*?)</div>', body, re.S)])
     nav, nav_m = [], []
     for i, (k, label, href) in enumerate(NAV):
         cur = ' aria-current="page"' if k == nav_key else ''
@@ -133,9 +185,8 @@ def render(key, meta, layout, icons, versions, body=None, nav_key=None):
     preload = ''
     if meta.get('preload'):
         preload = f'<link rel="preload" as="image" href="{meta["preload"]}" fetchpriority="high">'
-    schema = ''
-    if key == 'home':
-        schema = '<script type="application/ld+json">' + json.dumps(SCHEMA, separators=(',', ':')) + '</script>'
+    schema = ''.join('<script type="application/ld+json">' + json.dumps(s, separators=(',', ':'), ensure_ascii=False) + '</script>'
+                     for s in page_schema(key, meta))
     out = layout
     for k, v in {
         'title': html.escape(meta['title']),
@@ -172,10 +223,25 @@ def main():
     for key, meta in PAGES.items():
         render(key, meta, layout, icons, versions)
     services = json.loads((SRC / 'services.json').read_text(encoding='utf-8'))
-    for page in services:
-        meta = {'path': f'/{page["slug"]}/', 'title': page['title'], 'description': page['description']}
-        nav_key = 'pickup-delivery' if page['slug'] == 'pickup-delivery' else 'services'
-        render(page['slug'], meta, layout, icons, versions, body=render_service(page, services), nav_key=nav_key)
+    locations = json.loads((SRC / 'locations.json').read_text(encoding='utf-8'))
+    for page in services + locations:
+        slug = page['slug']
+        is_service = page in services and slug != 'services'
+        meta = {
+            'path': f'/{slug}/', 'title': page['title'], 'description': page['description'],
+            'crumb': SHORT_NAMES.get(slug), 'faq': faq_pairs(page),
+            'parent': ('Services', '/services/') if is_service else None,
+            'service': SHORT_NAMES.get(slug) if is_service else None,
+        }
+        nav_key = 'pickup-delivery' if slug == 'pickup-delivery' else ('services' if page in services else None)
+        render(slug, meta, layout, icons, versions, body=render_service(page, services), nav_key=nav_key)
+    # sitemap for the production domain (staging itself stays robots-disallowed)
+    paths = [m['path'] for m in PAGES.values()] + [f'/{p["slug"]}/' for p in services + locations]
+    today = date.today().isoformat()
+    urls = '\n'.join(f'  <url><loc>{BASE}{p}</loc><lastmod>{today}</lastmod></url>' for p in paths)
+    (ROOT / 'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                                      f'{urls}\n</urlset>\n', encoding='utf-8', newline='\n')
+    print(f'built sitemap.xml ({len(paths)} urls)')
 
 
 if __name__ == '__main__':
