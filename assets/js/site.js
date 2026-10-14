@@ -70,24 +70,18 @@
     });
   }
 
-  /* ---- header: solid on scroll, hide while scrolling down ---- */
+  /* ---- header: stays pinned to the top; turns translucent once the page scrolls ---- */
   const header = $('.header');
   const toTop = $('.to-top');
-  let lastY = scrollY;
   let ticking = false;
   const onScroll = () => {
     const y = scrollY;
-    if (header) {
-      header.classList.toggle('is-scrolled', y > 10);
-      const goingDown = y > lastY && y > 400;
-      if (!doc.classList.contains('menu-open')) header.classList.toggle('is-hidden', goingDown);
-    }
+    header?.classList.toggle('is-scrolled', y > 10);
     if (toTop) {
       const max = doc.scrollHeight - innerHeight;
       toTop.classList.toggle('is-visible', y > 600);
       toTop.style.setProperty('--p', max > 0 ? (y / max).toFixed(3) : 0);
     }
-    lastY = y;
     if (!reduce) { parallax(); steps(); yearFill(); }
     ticking = false;
   };
@@ -192,7 +186,6 @@
     burger?.setAttribute('aria-expanded', String(open));
     menu?.setAttribute('aria-hidden', String(!open));
     if (menu) menu.inert = !open;
-    header?.classList.remove('is-hidden');
     if (open) menu?.querySelector('a')?.focus({ preventScroll: true });
   };
   if (menu) menu.inert = true;
