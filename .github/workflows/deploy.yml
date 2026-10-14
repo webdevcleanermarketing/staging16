@@ -34,6 +34,6 @@ jobs:
         # No --delete: files already on the server that are not in the repo are left alone.
         run: |
           rsync -avz \
-            --exclude '.git/' --exclude '.github/' --exclude 'README.md' \
+            --exclude '.git/' --exclude '.github/' --exclude 'README.md' --exclude '_src/' --exclude '.gitattributes' \
             -e "ssh -p 18765 -i ~/.ssh/id_sg" \
             ./ "${{ secrets.SG_USER }}@${{ secrets.SG_HOST }}:${{ secrets.SG_PATH }}/"
