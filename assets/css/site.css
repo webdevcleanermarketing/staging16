@@ -599,7 +599,7 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .footer-meta .credit a { color: var(--gold); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(246, 214, 220, .4); text-underline-offset: 3px; transition: text-decoration-color .25s, color .25s; }
 .footer-meta .credit a:hover { color: var(--gold-300); text-decoration-color: currentColor; }
 
-.to-top { position: fixed; right: 20px; bottom: 20px; z-index: 40; width: 54px; height: 54px; border-radius: 50%; background: var(--wine-900); color: var(--gold); display: grid; place-items: center; box-shadow: var(--shadow); opacity: 0; transform: translateY(20px) scale(.8); transition: opacity .4s, transform .5s var(--ease); pointer-events: none; }
+.to-top { position: fixed; left: 20px; bottom: 20px; z-index: 40; width: 54px; height: 54px; border-radius: 50%; background: var(--wine-900); color: var(--gold); display: grid; place-items: center; box-shadow: var(--shadow); opacity: 0; transform: translateY(20px) scale(.8); transition: opacity .4s, transform .5s var(--ease); pointer-events: none; }
 .to-top.is-visible { opacity: 1; transform: none; pointer-events: auto; }
 .to-top svg.arrow { width: 18px; height: 18px; transform: rotate(-90deg); }
 .to-top svg.prog { position: absolute; inset: 0; transform: rotate(-90deg); }
